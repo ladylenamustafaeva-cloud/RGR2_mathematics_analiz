@@ -1,4 +1,4 @@
-# main.py — точка входа
+# main.py — точка входа (ОБНОВЛЁННАЯ ВЕРСИЯ)
 import numpy as np
 from methods import rectangles, trapezoid, simpson, three_eighths, adaptive_integration
 from plots import plot_error_vs_epsilon, plot_n_vs_epsilon
@@ -48,4 +48,40 @@ for name, method in methods.items():
         error = abs(result - exact_smooth)
         print(f"{name:<15} {eps:<10.1e} {n:<8} {error:<15.3e}")
 
-print("\n✅ Все графики сохранены в папке проекта!")
+# ===== 7. ГРАФИК СХОДИМОСТИ (НОВЫЙ БЛОК!) =====
+print("\n📈 Построение графика сходимости...")
+
+import matplotlib.pyplot as plt
+
+# Набор значений N для исследования сходимости
+N_values = [4, 8, 16, 32, 64, 128, 256, 512, 1024]
+
+plt.figure(figsize=(10, 7))
+
+for name, method in methods.items():
+    errors = []
+    for n in N_values:
+        result = method(f_smooth, a, b, n)
+        error = abs(result - exact_smooth)
+        errors.append(error)
+    
+    plt.loglog(N_values, errors, marker='o', label=name, linewidth=2)
+
+# Добавим теоретическую линию сходимости O(N^-2)
+plt.loglog(N_values, [1e-2 * (N_values[0]/n)**2 for n in N_values], 
+          '--', color='gray', alpha=0.5, label='O(N⁻²)')
+
+# Добавим теоретическую линию сходимости O(N^-4)
+plt.loglog(N_values, [1e-2 * (N_values[0]/n)**4 for n in N_values], 
+          '--', color='red', alpha=0.5, label='O(N⁻⁴)')
+
+plt.xlabel('Число разбиений N')
+plt.ylabel('Фактическая погрешность')
+plt.title('Сходимость методов численного интегрирования')
+plt.grid(True, which='both', alpha=0.3)
+plt.legend()
+plt.savefig('convergence_plot.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("✓ График сходимости сохранён: convergence_plot.png")
+
+print("\n✅ Все 5 графиков сохранены в папке проекта!")
